@@ -102,6 +102,7 @@ async function fetchTodos() {
         let response = await axios.get("https://todobackend-248o0is6.b4a.run/getTodos", { headers: { token: token } })
         todos = response.data.todos
         render();
+        document.getElementById('todo-input').value = ''
     } catch (error) {
         console.error("Error fetching todos:", error);
     }
