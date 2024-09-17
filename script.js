@@ -129,6 +129,8 @@ function signup() {
         } catch (error) {
             if (error.response.status === 403) {
                 alert('User already resgistered!')
+                signupUser.value = '';
+                signupPassword.value = '';
             } else {
                 console.error('Signup failed:', error);
                 alert('Signup failed. Please try again.');
