@@ -13,111 +13,86 @@ function main() {
 
 function renderSignupPage() {
     document.body.innerHTML = '';
-
     const signupContainer = document.createElement('div');
     signupContainer.className = 'container';
-
     const title = document.createElement('h2');
     title.innerText = 'Signup';
-
     const usernameInput = document.createElement('input');
     usernameInput.type = 'text';
     usernameInput.id = 'signupUsername';
     usernameInput.name = 'username';
     usernameInput.placeholder = 'Enter your email here';
-
     const passwordInput = document.createElement('input');
     passwordInput.type = 'password';
     passwordInput.id = 'signupPassword';
     passwordInput.name = 'password';
     passwordInput.placeholder = 'Enter your password here';
-
     const submitButton = document.createElement('button');
     submitButton.innerText = 'Submit';
     submitButton.onclick = signup;
-
     const signinLink = document.createElement('p');
     signinLink.innerHTML = 'Already signed up? <span style="cursor:pointer; color: #f1f1f1; text-decoration: underline;">Sign in now</span>';
     signinLink.onclick = renderSigninPage;
-
     signupContainer.appendChild(title);
     signupContainer.appendChild(usernameInput);
     signupContainer.appendChild(passwordInput);
     signupContainer.appendChild(submitButton);
     signupContainer.appendChild(signinLink);
-
     document.body.appendChild(signupContainer);
 }
 
 function renderSigninPage() {
     document.body.innerHTML = '';
-
     const signinContainer = document.createElement('div');
     signinContainer.className = 'container';
-
     const title = document.createElement('h2');
     title.innerText = 'Login';
-
     const usernameInput = document.createElement('input');
     usernameInput.type = 'text';
     usernameInput.id = 'signinUsername';
     usernameInput.name = 'username';
     usernameInput.placeholder = 'Enter your email here';
-
     const passwordInput = document.createElement('input');
     passwordInput.type = 'password';
     passwordInput.id = 'signinPassword';
     passwordInput.name = 'password';
     passwordInput.placeholder = 'Enter your password here';
-
     const submitButton = document.createElement('button');
     submitButton.innerText = 'Login';
     submitButton.onclick = signin;
-
     const signupLink = document.createElement('p');
     signupLink.innerHTML = 'Not signed up yet? <span style="cursor:pointer; color: #f1f1f1; text-decoration: underline;">Sign up now</span>';
     signupLink.onclick = renderSignupPage;
-
     signinContainer.appendChild(title);
     signinContainer.appendChild(usernameInput);
     signinContainer.appendChild(passwordInput);
     signinContainer.appendChild(submitButton);
     signinContainer.appendChild(signupLink);
-
     document.body.appendChild(signinContainer);
 }
 
 function renderLandingPage() {
     document.body.innerHTML = '';
-
     const logoutButton = document.createElement('button');
     logoutButton.innerText = 'Logout';
     logoutButton.className = 'logout-button';
     logoutButton.onclick = logout;
-
     document.body.appendChild(logoutButton);
-
     const container = document.createElement('div');
     container.className = 'container';
-
     const input = document.createElement('input');
     input.type = 'text';
     input.id = 'todo-input';
     input.placeholder = 'Enter a new task...';
-
     const addButton = document.createElement('button');
     addButton.innerText = 'Add Todo';
     addButton.onclick = addTodo;
-
     const todolist = document.createElement('div');
     todolist.className = 'todolist';
-
     container.appendChild(input);
     container.appendChild(addButton);
     container.appendChild(todolist);
-
     document.body.appendChild(container);
-
     fetchTodos();
 }
 
@@ -140,19 +115,25 @@ function signup() {
         let password = signupPassword.value;
 
         try {
-            await axios.post('https://todobackend-248o0is6.b4a.run/signup', {
+            let response = await axios.post('https://todobackend-248o0is6.b4a.run/signup', {
                 email: email,
                 password: password
             });
-            signupUser.value = '';
-            signupPassword.value = '';
-            alert('Signup successful!');
-            renderSigninPage();
+            if (response.status === 200) {
+                signupUser.value = '';
+                signupPassword.value = '';
+                alert('Signup successful!');
+                renderSigninPage();
+            } else alert('Signup failed!')
         } catch (error) {
-            console.error('Signup failed:', error);
-            alert('Signup failed. Please try again.');
-            signupUser.value = '';
-            signupPassword.value = '';
+            if (error.response.status === 403) {
+                alert('User already resgistered!')
+            } else {
+                console.error('Signup failed:', error);
+                alert('Signup failed. Please try again.');
+                signupUser.value = '';
+                signupPassword.value = '';
+            }
         }
     })();
 }
@@ -169,8 +150,17 @@ function signin() {
                     password: password
                 }
             });
-            localStorage.setItem('token', response.data.token);
-            renderLandingPage();
+            if (response.status === 200) {
+                localStorage.setItem('token', response.data.token);
+                renderLandingPage();
+                alert('Signed In!')
+            } else if (response.status === 403) {
+                alert('User not found! Please Signup!')
+            } else if (response.status === 400) {
+                alert('Password is not valid!')
+            } else {
+                alert('Error whle signing in!')
+            }
         } catch (error) {
             console.error('Signin failed:', error);
             alert('Signin failed. Please check your credentials and try again.');
@@ -205,7 +195,9 @@ async function deleteTodo(index) {
     try {
         let token = localStorage.getItem('token')
         await axios.delete("https://todobackend-248o0is6.b4a.run/deleteTodo", { headers: { token: token, id: todos[index]._id } })
+        console.log('Error is coming')
         fetchTodos()
+        console.log('Error is coming')
     } catch (error) {
         alert('Failed request! Please try again')
     }
@@ -222,6 +214,7 @@ async function saveTodo(index) {
     if (title === '') {
         alert('The input box cannot be empty')
     } else {
+        console.log('Inside the save todo function')
         try {
             await axios.put("https://todobackend-248o0is6.b4a.run/editTodo", { id: todos[index]._id, title: title }, { headers: { token: token } })
             editIndex = -1
