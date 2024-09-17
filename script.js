@@ -180,6 +180,7 @@ function logout() {
 
 async function addTodo() {
     const todoInput = document.querySelector("#todo-input").value.trim();
+    document.getElementById('todo-input').value = ''
     let result = todos.find(e => e.title === todoInput)
     if (todoInput === '') {
         alert('The input box cannot be empty');
