@@ -188,7 +188,6 @@ async function addTodo() {
         alert('The todo already exists')
         document.getElementById('todo-input').value = ''
     } else {
-        console.log('here')
         let token = localStorage.getItem('token')
         try {
             await axios.post("https://todobackend-248o0is6.b4a.run/addTodo", { title: todoInput }, { headers: { token: token } })
