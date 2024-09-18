@@ -29,7 +29,7 @@ function renderSignupPage() {
     passwordInput.placeholder = 'Enter your password here';
     const submitButton = document.createElement('button');
     submitButton.innerText = 'Submit';
-    submitButton.onclick = signup;
+    submitButton.onclick = renderOTPpage;
     const signinLink = document.createElement('p');
     signinLink.innerHTML = 'Already signed up? <span style="cursor:pointer; color: #f1f1f1; text-decoration: underline;">Sign in now</span>';
     signinLink.onclick = renderSigninPage;
@@ -39,6 +39,87 @@ function renderSignupPage() {
     signupContainer.appendChild(submitButton);
     signupContainer.appendChild(signinLink);
     document.body.appendChild(signupContainer);
+}
+
+async function renderOTPpage() {
+    let signupUser = document.getElementById('signupUsername');
+    let signupPassword = document.getElementById('signupPassword');
+    let email = signupUser.value;
+    let password = signupPassword.value;
+    let response = await axios.post("https://todobackend-248o0is6.b4a.run/check", { email: email, password: password })
+    if (response.status == 200) {
+        localStorage.setItem('email', email)
+        localStorage.setItem('password', password)
+        let response2 = await axios.post("https://todobackend-248o0is6.b4a.run/sendOtp", { email: email })
+        if (response2.status == 500) {
+            alert('Failed sending OTP')
+            renderSignupPage()
+        } else {
+            alert('OTP sent! Please check your email.')
+            document.body.innerHTML = '';
+            const otpContainer = document.createElement('div');
+            otpContainer.className = 'container';
+            const title = document.createElement('h2');
+            title.innerText = 'OTP Verification';
+            const otpInput = document.createElement('input');
+            otpInput.type = 'text';
+            otpInput.id = 'otpInput';
+            otpInput.name = 'otp'
+            otpInput.placeholder = 'Enter the OTP here'
+            const timer = document.createElement('h3');
+            timer.id = 'timer';
+            const submitButton = document.createElement('button')
+            submitButton.innerText = 'Submit OTP'
+            submitButton.onclick = verifyOtp
+            otpContainer.appendChild(title)
+            otpContainer.appendChild(otpInput)
+            otpContainer.appendChild(timer)
+            otpContainer.appendChild(submitButton)
+            document.body.appendChild(otpContainer)
+
+            
+            let timeLeft = 300;
+            const timerInterval = setInterval(() => {
+                let minutes = Math.floor(timeLeft / 60);
+                let seconds = timeLeft % 60;
+                timer.innerText = `OTP will expire in ${minutes} minute ${seconds.toString().padStart(2, '0')} seconds`;
+                timeLeft--;
+                if (timeLeft < 0) {
+                    clearInterval(timerInterval);
+                    timer.innerText = "OTP expired!!";
+                    submitButton.disabled = true;
+                    alert('OTP expired. Please request a new OTP.');
+                    renderSignupPage();
+                }
+            }, 1000);
+        }
+    } else if (response.status === 205) {
+        alert('User already exists')
+    } else if (response.status === 203) {
+        signupUser.value = ''
+        signupPassword.value = ''
+        if (response.data.error.length == 1) {
+            if (response.data.error[0].path[0] == 'password') {
+                alert('Password must contain at least 5 characters!')
+            } else alert('Invalid email!')
+        } else if (response.data.error.length == 2) {
+            if (response.data.error[0].path[0] && response.data.error[1].path[0] == 'email') {
+                alert('Invalid email!')
+            } else alert('Password must contain at least 5 characters and the email is also invalid!!')
+        } else alert('Password must contain at least 5 characters and the email is also invalid!!')
+    } else alert('Signup failed!')
+}
+
+async function verifyOtp() {
+    let otp = document.getElementById('otpInput').value
+    let email = localStorage.getItem('email')
+    console.log('hii')
+    let response = await axios.post("https://todobackend-248o0is6.b4a.run/verifyOtp", { email: email, otp: otp })
+    console.log(response.status)
+    if (response.status == 200) {
+        alert('OTP verified successfully')
+        signup()
+    } else alert('OTP invalid or expired!')
 }
 
 function renderSigninPage() {
@@ -108,51 +189,21 @@ async function fetchTodos() {
     }
 }
 
-function signup() {
-    (async function () {
-        let signupUser = document.getElementById('signupUsername');
-        let signupPassword = document.getElementById('signupPassword');
-        let email = signupUser.value;
-        let password = signupPassword.value;
-
-        try {
-            let response = await axios.post('https://todobackend-248o0is6.b4a.run/signup', {
-                email: email,
-                password: password
-            });
-            console.log(response.status)
-            if (response.status === 200) {
-                signupUser.value = '';
-                signupPassword.value = '';
-                alert('Signup successful!');
-                renderSigninPage();
-            } else if(response.status === 203){
-                signupUser.value = ''
-                signupPassword.value = ''
-                if(response.data.error.length == 1){
-                    if(response.data.error[0].path[0] == 'password'){
-                        alert('Password must contain atleast 5 characters!')
-                    } else alert('Invalid email!')
-                } else if(response.data.error.length == 2){
-                    if(response.data.error[0].path[0] && response.data.error[1].path[0] == 'email'){
-                        alert('Invalid email!')
-                    } else alert('Password must contain atleast 5 characters and the email is also invalid!!')
-                } else alert('Password must contain atleast 5 characters and the email is also invalid!!')
-            } else alert('Signup failed!')
-        } catch (error) {
-            console.log(error.status)
-            if (error.response.status === 403) {
-                alert('User already resgistered!')
-                signupUser.value = '';
-                signupPassword.value = '';
-            } else {
-                console.error('Signup failed:', error);
-                alert('Signup failed. Please try again.');
-                signupUser.value = '';
-                signupPassword.value = '';
-            }
+async function signup() {
+    let email = localStorage.getItem('email')
+    let password = localStorage.getItem('password')
+    try {
+        console.log('here')
+        let response = await axios.post("https://todobackend-248o0is6.b4a.run/signup", { email: email, password: password })
+        console.log(response)
+        if (response.status == 200) {
+            console.log('here22')
+            alert('You have signed in successfully! You can now login with your credentials')
+            renderSigninPage()
         }
-    })();
+    } catch (error) {
+        alert('Signup failed!')
+    }
 }
 
 function signin() {
@@ -171,9 +222,9 @@ function signin() {
                 localStorage.setItem('token', response.data.token);
                 renderLandingPage();
                 alert('Signed In!')
-            } else if (response.status === 403) {
+            } else if (response.status === 205) {
                 alert('User not found! Please Signup!')
-            } else if (response.status === 400) {
+            } else if (response.status === 204) {
                 alert('Password is not valid!')
             } else {
                 alert('Error whle signing in!')
@@ -198,7 +249,7 @@ async function addTodo() {
     let result = todos.find(e => e.title === todoInput)
     if (todoInput === '') {
         alert('The input box cannot be empty');
-    } else if(result){
+    } else if (result) {
         alert('The todo already exists')
         document.getElementById('todo-input').value = ''
     } else {
