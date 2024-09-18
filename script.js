@@ -120,13 +120,27 @@ function signup() {
                 email: email,
                 password: password
             });
+            console.log(response.status)
             if (response.status === 200) {
                 signupUser.value = '';
                 signupPassword.value = '';
                 alert('Signup successful!');
                 renderSigninPage();
+            } else if(response.status === 203){
+                signupUser.value = ''
+                signupPassword.value = ''
+                if(response.data.error.length == 1){
+                    if(response.data.error[0].path[0] == 'password'){
+                        alert('Password must contain atleast 5 characters!')
+                    } else alert('Invalid email!')
+                } else if(response.data.error.length == 2){
+                    if(response.data.error[0].path[0] && response.data.error[1].path[0] == 'email'){
+                        alert('Invalid email!')
+                    } else alert('Password must contain atleast 5 characters and the email is also invalid!!')
+                } else alert('Password must contain atleast 5 characters and the email is also invalid!!')
             } else alert('Signup failed!')
         } catch (error) {
+            console.log(error.status)
             if (error.response.status === 403) {
                 alert('User already resgistered!')
                 signupUser.value = '';
