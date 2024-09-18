@@ -227,6 +227,7 @@ function signin() {
                 alert('User not found! Please Signup!')
             } else if (response.status === 204) {
                 alert('Password is not valid!')
+                document.getElementById('signinPassword').value = ''
             } else {
                 alert('Error whle signing in!')
             }
