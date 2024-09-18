@@ -94,7 +94,8 @@ async function renderOTPpage() {
             }, 1000);
         }
     } else if (response.status === 205) {
-        alert('User already exists')
+        alert('User already exists! Please login')
+        renderSigninPage()
     } else if (response.status === 203) {
         signupUser.value = ''
         signupPassword.value = ''
