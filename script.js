@@ -198,7 +198,7 @@ async function signup() {
         console.log(response)
         if (response.status == 200) {
             console.log('here22')
-            alert('You have signed in successfully! You can now login with your credentials')
+            alert('You have signed up successfully! You can now login with your credentials')
             renderSigninPage()
         }
     } catch (error) {
