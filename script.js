@@ -16,7 +16,7 @@ function renderSignupPage() {
     const signupContainer = document.createElement('div');
     signupContainer.className = 'container';
     const title = document.createElement('h2');
-    title.innerText = 'Signup';
+    title.innerText = 'Create new account';
     const usernameInput = document.createElement('input');
     usernameInput.type = 'text';
     usernameInput.id = 'signupUsername';
@@ -26,7 +26,7 @@ function renderSignupPage() {
     passwordInput.type = 'password';
     passwordInput.id = 'signupPassword';
     passwordInput.name = 'password';
-    passwordInput.placeholder = 'Enter your password here';
+    passwordInput.placeholder = 'Create a password';
     const submitButton = document.createElement('button');
     submitButton.innerText = 'Submit';
     submitButton.onclick = renderOTPpage;
