@@ -242,7 +242,7 @@ function signin() {
 
 function logout() {
     localStorage.removeItem('token');
-    location.reload();
+    renderSigninPage();
 }
 
 async function addTodo() {
