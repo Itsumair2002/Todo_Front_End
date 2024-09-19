@@ -2,7 +2,6 @@ let todos = [];
 let editIndex = -1;
 
 function main() {
-    console.log('The script is running...')
     let token = localStorage.getItem('token');
     if (token) {
         renderLandingPage();
