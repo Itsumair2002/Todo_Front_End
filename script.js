@@ -286,7 +286,6 @@ async function saveTodo(index) {
     if (title === '') {
         alert('The input box cannot be empty')
     } else {
-        console.log('Inside the save todo function')
         try {
             await axios.put("https://todobackend-248o0is6.b4a.run/editTodo", { id: todos[index]._id, title: title }, { headers: { token: token } })
             editIndex = -1
