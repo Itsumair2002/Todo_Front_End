@@ -269,9 +269,7 @@ async function deleteTodo(index) {
     try {
         let token = localStorage.getItem('token')
         await axios.delete("https://todobackend-248o0is6.b4a.run/deleteTodo", { headers: { token: token, id: todos[index]._id } })
-        console.log('Error is coming')
         fetchTodos()
-        console.log('Error is coming')
     } catch (error) {
         alert('Failed request! Please try again')
     }
