@@ -120,6 +120,8 @@ async function verifyOtp() {
     if (response.status == 200) {
         alert('OTP verified successfully')
         signup()
+        localStorage.removeItem('email')
+        localStorage.removeItem('password')
     } else alert('OTP invalid or expired!')
 }
 
