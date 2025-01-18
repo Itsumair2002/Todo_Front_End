@@ -1,16 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Todo Application</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Dramatic Welcome Animation</title>
+    <style>
+        /* CSS for a cinematic black and white look */
+        body, html {
+            height: 100%;
+            margin: 0;
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+
+        .text-container {
+            font-size: 0; /* Prevent spacing issues */
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            white-space: nowrap; /* Ensures text stays on one line */
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff, 0 0 40px #000, 0 0 70px #000, 0 0 80px #000, 0 0 100px #000, 0 0 150px #000;
+            }
+            50% {
+                text-shadow: 0 0 20px #fff, 0 0 30px #fff, 0 0 40px #fff, 0 0 50px #fff, 0 0 60px #fff, 0 0 70px #fff, 0 0 90px #fff, 0 0 100px #fff;
+            }
+        }
+
+        .char, .space {
+            display: inline-block;
+            font-size: 48px; /* Initial size for larger screens */
+            opacity: 0;
+            animation: fadeIn 2s forwards, glow 8s infinite alternate;
+            animation-delay: calc(0.1s * var(--char-index));
+        }
+
+        .space {
+            width: 0.5em; /* Adjust space width between words */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .char, .space {
+                font-size: 24px; /* Smaller font size for tablets */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .char, .space {
+                font-size: 16px; /* Smaller font size for mobile phones */
+            }
+        }
+    </style>
 </head>
-
 <body>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src="script.js"></script>
-</body>
+    <div class="text-container" id="animated-text"></div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const text = "Welcome to Madarchod College, 'CIEM'";
+            const container = document.getElementById('animated-text');
+            let index = 0;
 
+            text.split('').forEach((char) => {
+                let span = document.createElement('span');
+                span.style.setProperty('--char-index', index);
+                if (char === ' ') {
+                    span.className = 'space';
+                } else {
+                    span.textContent = char;
+                    span.className = 'char';
+                    index++; // Increment index for visible characters only
+                }
+                container.appendChild(span);
+            });
+        });
+    </script>
+</body>
 </html>
